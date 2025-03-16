@@ -1,0 +1,35 @@
+[
+  {
+    "location": "Sogamoso",
+    "name": "Football",
+    "description": "Soccer training",
+    "date": "Mar 17, 2025, 12:00:00 AM",
+    "maxParticipants": 15,
+    "registeredVolunteers": [
+      {
+        "name": "Luis Pepe Lorenzo Castilla",
+        "age": 22,
+        "email": "pepecastilla@gmail.com"
+      },
+      {
+        "name": "Brayan Andres Rodriguez Solano",
+        "age": 19,
+        "email": "brayansolano@gmail.com"
+      }
+    ]
+  },
+  {
+    "platform": "Zoom",
+    "name": "Dances",
+    "description": "Dance training",
+    "date": "Mar 18, 2025, 12:00:00 AM",
+    "maxParticipants": 10,
+    "registeredVolunteers": [
+      {
+        "name": "Sara Lucia Fernandez Pinto",
+        "age": 22,
+        "email": "sarapinto@gmail.com"
+      }
+    ]
+  }
+]
