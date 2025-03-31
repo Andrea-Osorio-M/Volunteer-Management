@@ -96,4 +96,17 @@ public class VolunteerService {
         }
         return activity.cancelRegistration(volunteer);
     }
+
+    public boolean removeVolunteerByEmail(String email) {
+        List<Volunteer> volunteers = getVolunteers(); // Obtener lista de voluntarios
+    
+        for (int i = 0; i < volunteers.size(); i++) {
+            if (volunteers.get(i).getEmail().equalsIgnoreCase(email)) {
+                volunteers.remove(i);
+                return true; // Se eliminó correctamente
+            }
+        }
+        return false; // No se encontró el voluntario
+    }
+    
 }
