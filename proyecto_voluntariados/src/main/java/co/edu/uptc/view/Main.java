@@ -16,50 +16,106 @@ import co.edu.uptc.persistence.JSONPersistence;
 /**
  * Main class to manage volunteer registration via console.
  */
-
 public class Main {
-    private static Scanner scanner = new Scanner(System.in);
-    private static VolunteerService volunteerService = new VolunteerService();
-    private static List<Activity> activities = new ArrayList<>();
-
-    public static void main(String[] args) {
-        while (true) {
-            System.out.println("\n===== Volunteer Management System =====");
-            System.out.println("1. Register Volunteer");
-            System.out.println("2. Create Activity");
-            System.out.println("3. Enroll Volunteer in Activity");
-            System.out.println("4. Cancel Volunteer Enrollment");
-            System.out.println("5. List Volunteers by Activity");
-            System.out.println("6. Save & Exit");
-            System.out.print("Choose an option: ");
-            
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
-            
-            switch (choice) {
-                case 1:
-                    registerVolunteer();
-                    break;
-                case 2:
-                    createActivity();
-                    break;
-                case 3:
-                    enrollVolunteer();
-                    break;
-                case 4:
-                    cancelEnrollment();
-                    break;
-                case 5:
-                    listVolunteersByActivity();
-                    break;
-                case 6:
-                    saveData();
-                    System.out.println("Data saved. Exiting...");
-                    return;
-                default:
-                    System.out.println("Invalid option. Please try again.");
+    static Scanner scanner = new Scanner(System.in);
+    static VolunteerService volunteerService = new VolunteerService();
+    static List<Activity> activities = new ArrayList<>();
+    
+        public static void main(String[] args) {
+            while (true) {
+                System.out.println("\n===== Volunteer Management System =====");
+                System.out.println("1. Manage Volunteers");
+                System.out.println("2. Manage Activities");
+                System.out.println("3. Save & Exit");
+                System.out.print("Choose an option: ");
+                
+                int choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                
+                switch (choice) {
+                    case 1:
+                        manageVolunteers();
+                        break;
+                    case 2:
+                        manageActivities();
+                        break;
+                    case 3:
+                        saveData();
+                        System.out.println("Data saved. Exiting...");
+                        return;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
             }
         }
+    
+        private static void manageVolunteers() {
+            while (true) {
+                System.out.println("\n===== Volunteer Management =====");
+                System.out.println("1. Register Volunteer");
+                System.out.println("2. List Volunteers");
+                System.out.println("3. Delete Volunteer");
+                System.out.println("4. Back to Main Menu");
+                System.out.print("Choose an option: ");
+                
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                
+                switch (choice) {
+                    case 1:
+                        registerVolunteer();
+                        break;
+                    case 2:
+                        listVolunteers();
+                        break;
+                    case 3:
+                        deleteVolunteer();
+                        break;
+                    case 4:
+                        return;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        }
+    
+        private static void manageActivities() {
+            while (true) {
+                System.out.println("\n===== Activity Management =====");
+                System.out.println("1. Create Activity");
+                System.out.println("2. List Volunteers By Activities");
+                System.out.println("3. Enroll Volunteer in Activity");
+                System.out.println("4. Cancel Volunteer Enrollment");
+                System.out.println("5. Back to Main Menu");
+                System.out.print("Choose an option: ");
+                
+                int choice = scanner.nextInt();
+                scanner.nextLine();
+                
+                switch (choice) {
+                    case 1:
+                        createActivity();
+                        break;
+                    case 2:
+                        listVolunteersByActivity();
+                        break;
+                    case 3:
+                        enrollVolunteer();
+                        break;
+                    case 4:
+                        cancelEnrollment();
+                        break;
+                    case 5:
+                        return;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        }
+    
+        private static void saveData() {
+            JSONPersistence.saveVolunteers(volunteerService.getVolunteers());
+        JSONPersistence.saveActivities(activities);
     }
 
     private static void registerVolunteer() {
@@ -220,8 +276,31 @@ public class Main {
         }
     }
 
-    private static void saveData() {
-        JSONPersistence.saveVolunteers(volunteerService.getVolunteers());
-        JSONPersistence.saveActivities(activities);
+    private static void listVolunteers() {
+        List<Volunteer> volunteers = volunteerService.getVolunteers();
+        
+        if (volunteers.isEmpty()) {
+            System.out.println("No volunteers registered.");
+            return;
+        }
+    
+        System.out.println("\n===== Registered Volunteers =====");
+        for (Volunteer v : volunteers) {
+            System.out.println("Name: " + v.getName() + " | Age: " + v.getAge() + " | Email: " + v.getEmail());
+        }
+    }    
+    
+    private static void deleteVolunteer() {
+        System.out.print("Enter the Volunteer Email to delete: ");
+        String email = scanner.nextLine();
+    
+        boolean removed = volunteerService.removeVolunteerByEmail(email);
+        
+        if (removed) {
+            System.out.println("Volunteer removed successfully.");
+            saveData(); // Guardar cambios en el JSON
+        } else {
+            System.out.println("Volunteer not found.");
+        }
     }
 }
