@@ -1,99 +1,95 @@
 package co.edu.uptc.controller;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import co.edu.uptc.model.Activity;
 import co.edu.uptc.model.Volunteer;
 import co.edu.uptc.persistence.JSONPersistence;
 
-/**
- * Service class for managing volunteers.
- */
 public class VolunteerService {
     private List<Volunteer> volunteers;
+    private List<Activity> activities;
 
-    /**
-     * Constructor to initialize the volunteer list from JSON.
-     */
     public VolunteerService() {
-        this.volunteers = JSONPersistence.loadVolunteers();
-    }
-
-    /**
-     * Registers a new volunteer if they meet the age requirement.
-     * @param volunteer The volunteer to register.
-     * @return True if registration is successful, false otherwise.
-     */
-    public boolean registerVolunteer(Volunteer volunteer) {
-        if (volunteer.getAge() >= 18) {
-            volunteers.add(volunteer);
-            JSONPersistence.saveVolunteers(volunteers);
-            return true;
+        try {
+            this.volunteers = JSONPersistence.loadVolunteers();
+            this.activities = JSONPersistence.loadActivities();
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading data: " + e.getMessage(), e);
         }
-        return false;
     }
 
-    /**
-     * Retrieves the list of registered volunteers.
-     * @return List of volunteers.
-     */
+    public boolean registerVolunteer(Volunteer volunteer) {
+        if (volunteer.getAge() < 18) {
+            throw new IllegalArgumentException("The volunteer must be at least 18 years old to register.");
+        }
+        volunteers.add(volunteer);
+        JSONPersistence.saveVolunteers(volunteers);
+        return true;
+    }
+
     public List<Volunteer> getVolunteers() {
         return volunteers;
     }
 
-    /**
-     * Finds a volunteer by email.
-     * @param email The email to search for.
-     * @return The found volunteer or null if not found.
-     */
+    public List<Activity> getActivities() {
+        return activities;
+    }    
+
     public Volunteer findVolunteerByEmail(String email) {
-        for (Volunteer v : volunteers) {
-            if (v.getEmail().equalsIgnoreCase(email)) {
-                return v;
-            }
-        }
-        return null;
+        return volunteers.stream()
+                .filter(v -> v.getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElse(null);
     }
 
-    /**
-     * Finds a volunteer by name.
-     * @param name The name to search for.
-     * @return The found volunteer or null if not found.
-     */
     public Volunteer getVolunteerByName(String name) {
-        for (Volunteer v : volunteers) {
-            if (v.getName().equalsIgnoreCase(name)) {
-                return v;
-            }
-        }
-        return null;
+        return volunteers.stream()
+                .filter(v -> v.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
     }
 
-    /**
-     * Enrolls a volunteer in an activity if there is available space.
-     * @param volunteer The volunteer to enroll.
-     * @param activity The activity to enroll in.
-     * @return True if enrollment is successful, false otherwise.
-     */
     public boolean registerVolunteerToActivity(Volunteer volunteer, Activity activity) {
         if (activity.getRegisteredVolunteers().contains(volunteer)) {
-            System.out.println("Volunteer is already registered for this activity.");
-            return false;
+            throw new IllegalStateException("Volunteer is already registered for this activity.");
         }
-        return activity.registerVolunteer(volunteer);
+        if (activity.getRegisteredVolunteers().size() >= activity.getMaxParticipants()) {
+            throw new IllegalStateException("Activity is already full.");
+        }
+        boolean success = activity.registerVolunteer(volunteer);
+        if (success) JSONPersistence.saveActivities(activities);
+        return success;
     }
 
-    /**
-     * Removes a volunteer from an activity.
-     * @param volunteer The volunteer to remove.
-     * @param activity The activity to remove from.
-     * @return True if removal is successful, false otherwise.
-     */
     public boolean cancelVolunteerFromActivity(Volunteer volunteer, Activity activity) {
         if (!activity.getRegisteredVolunteers().contains(volunteer)) {
-            System.out.println("Volunteer is not registered in this activity.");
-            return false;
+            throw new IllegalStateException("Volunteer is not registered in this activity.");
         }
-        return activity.cancelRegistration(volunteer);
+        boolean success = activity.cancelRegistration(volunteer);
+        if (success) JSONPersistence.saveActivities(activities);
+        return success;
+    }
+
+    public void generateParticipationReport() {
+        Map<Volunteer, Long> participationCounts = activities.stream()
+            .flatMap(activity -> activity.getRegisteredVolunteers().stream())
+            .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
+
+        List<Map.Entry<Volunteer, Long>> sortedVolunteers = new ArrayList<>(participationCounts.entrySet());
+        sortedVolunteers.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
+
+        try (FileWriter writer = new FileWriter("volunteer_report.txt")) {
+            for (Map.Entry<Volunteer, Long> entry : sortedVolunteers) {
+                writer.write(entry.getKey().getName() + " - " + entry.getValue() + " activities\n");
+            }
+        } catch (IOException e) {
+            System.err.println("Error writing report: " + e.getMessage());
+        }
     }
 }

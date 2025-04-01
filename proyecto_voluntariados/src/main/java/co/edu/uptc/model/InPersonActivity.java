@@ -8,7 +8,7 @@ import java.util.Date;
 public class InPersonActivity extends Activity {
     private String location;
 
-    public InPersonActivity(String name, String description, Date date, int maxParticipants, String location) {
+    public InPersonActivity(String name, String description, Date date, int maxParticipants, String location, String type) {
         super(name, description, date, maxParticipants);
         this.location = location;
     }
