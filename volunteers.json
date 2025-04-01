@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 [
   {
     "name": "Luis Pepe Lorenzo Castilla",
@@ -19,4 +20,27 @@
     "age": 18,
     "email": "carlosgutierrez@gmail.com"
   }
+=======
+[
+  {
+    "name": "Luis Pepe Lorenzo Castilla",
+    "age": 22,
+    "email": "pepecastilla@gmail.com"
+  },
+  {
+    "name": "Sara Lucia Fernandez Pinto",
+    "age": 22,
+    "email": "sarapinto@gmail.com"
+  },
+  {
+    "name": "Brayan Andres Rodriguez Solano",
+    "age": 19,
+    "email": "brayansolano@gmail.com"
+  },
+  {
+    "name": "Carlos Andres Gutierrez Lopez",
+    "age": 18,
+    "email": "carlosgutierrez@gmail.com"
+  }
+>>>>>>> Developer2
 ]
