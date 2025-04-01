@@ -1,4 +1,6 @@
 package co.edu.uptc.view;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,7 +87,8 @@ public class Main {
                 System.out.println("2. List Volunteers By Activities");
                 System.out.println("3. Enroll Volunteer in Activity");
                 System.out.println("4. Cancel Volunteer Enrollment");
-                System.out.println("5. Back to Main Menu");
+                System.out.println("5. Generate Report");
+                System.out.println("6. Back to Main Menu");
                 System.out.print("Choose an option: ");
                 
                 int choice = scanner.nextInt();
@@ -105,6 +108,9 @@ public class Main {
                         cancelEnrollment();
                         break;
                     case 5:
+                    generateReport();
+                        break;
+                    case 6:
                         return;
                     default:
                         System.out.println("Invalid option. Please try again.");
@@ -114,12 +120,17 @@ public class Main {
     
         private static void saveData() {
             JSONPersistence.saveVolunteers(volunteerService.getVolunteers());
-        JSONPersistence.saveActivities(activities);
+            JSONPersistence.saveActivities(activities);
     }
 
     private static void registerVolunteer() {
         System.out.print("Enter volunteer full name: ");
         String name = scanner.nextLine();
+
+        if (!name.matches("[a-zA-Z\\s]+")) {
+            System.out.println("Invalid name. Only letters and spaces are allowed.");
+            return;
+        }
         
         System.out.print("Enter age: ");
         int age = scanner.nextInt();
@@ -149,7 +160,7 @@ public class Main {
         try {
             date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
         } catch (Exception e) {
-            System.out.println("Invalid date format.");
+            System.out.println("Invalid date format, please try again.");
             return;
         }
 
@@ -162,18 +173,27 @@ public class Main {
         scanner.nextLine(); // Consume newline
 
         Activity activity;
-        if (type == 1) {
-            System.out.print("Enter location: ");
-            String location = scanner.nextLine();
-            activity = new InPersonActivity(activityName, description, date, maxCapacity, location);
-        } else {
-            System.out.print("Enter platform: ");
-            String platform = scanner.nextLine();
-            activity = new VirtualActivity(activityName, description, date, maxCapacity, platform);
+        try {
+            if (type == 1) {
+                System.out.print("Enter location: ");
+                String location = scanner.nextLine().trim();
+                if (location.isEmpty()) {
+                    throw new IllegalArgumentException("Location cannot be empty.");
+                }
+                activity = new InPersonActivity(activityName, description, date, maxCapacity, location, "In-Person");
+            } else {
+                System.out.print("Enter platform: ");
+                String platform = scanner.nextLine().trim();
+                if (platform.isEmpty()) {
+                    throw new IllegalArgumentException("Platform cannot be empty.");
+                }
+                activity = new VirtualActivity(activityName, description, date, maxCapacity, platform, "Virtual");
+            }
+            activities.add(activity);
+            System.out.println("Activity created successfully.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-
-        activities.add(activity);
-        System.out.println("Activity created successfully.");
     }
 
     private static void enrollVolunteer() {
@@ -300,6 +320,29 @@ public class Main {
             saveData(); // Guardar cambios en el JSON
         } else {
             System.out.println("Volunteer not found.");
+        }
+    }
+
+    private static void generateReport() {
+        try (FileWriter writer = new FileWriter("report.txt")) {
+            writer.write("===== Volunteer Management Report =====\n\n");
+            
+            writer.write("Registered Volunteers:\n");
+            for (Volunteer v : volunteerService.getVolunteers()) {
+                writer.write("- " + v.getName() + " (Age: " + v.getAge() + ", Email: " + v.getEmail() + ")\n");
+            }
+
+            writer.write("\nActivities:\n");
+            for (Activity a : activities) {
+                writer.write(a.toString() + "\n");
+                for (Volunteer v : a.getRegisteredVolunteers()) {
+                    writer.write("  * " + v.getName() + "\n");
+                }
+            }
+            
+            System.out.println("Report saved as report.txt");
+        } catch (IOException e) {
+            System.out.println("Error generating report: " + e.getMessage());
         }
     }
 }

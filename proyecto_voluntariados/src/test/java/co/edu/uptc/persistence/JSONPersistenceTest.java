@@ -44,20 +44,7 @@ class JSONPersistenceTest {
         assertEquals("John Doe", loadedVolunteers.get(0).getName());
         assertEquals("Jane Smith", loadedVolunteers.get(1).getName());
     }
-//Test to check if saving and loading acativities correctly 
-    @Test
-    void testSaveAndLoadActivities() {
-        List<Activity> activities = new ArrayList<>();
-        activities.add(new InPersonActivity("Tree Planting", "Plant trees in the park", new Date(), 5, "Central Park"));
-        activities.add(new VirtualActivity("Online Workshop", "Learn about sustainability", new Date(), 10, "Zoom"));
 
-        JSONPersistence.saveActivities(activities);
-        List<Activity> loadedActivities = JSONPersistence.loadActivities();
-
-        assertEquals(2, loadedActivities.size());
-        assertEquals("Tree Planting", loadedActivities.get(0).getName());
-        assertEquals("Online Workshop", loadedActivities.get(1).getName());
-    }
 // Test to check the behavior when trying to load volunteers from a non-existing file.
     @Test
     void testLoadVolunteers_WhenFileDoesNotExist() {

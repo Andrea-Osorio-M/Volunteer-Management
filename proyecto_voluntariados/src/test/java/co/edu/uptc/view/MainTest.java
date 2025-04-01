@@ -38,7 +38,7 @@ class MainTest {
     void testCreateActivity() throws Exception {
         String dateStr = "2025-04-01";
         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateStr);
-        Activity activity = new InPersonActivity("Clean-Up", "Community clean-up event", date, 10, "City Park");
+        Activity activity = new InPersonActivity("Clean-Up", "Community clean-up event", date, 10, "City Park", "In-person");
         activities.add(activity);
         assertEquals(1, activities.size());
     }
@@ -47,7 +47,7 @@ class MainTest {
     void testEnrollVolunteer() {
         Volunteer volunteer = new Volunteer("Alice", 30, "alice@example.com");
         volunteerService.registerVolunteer(volunteer);
-        Activity activity = new VirtualActivity("Webinar", "Online learning", new Date(), 5, "Zoom");
+        Activity activity = new VirtualActivity("Webinar", "Online learning", new Date(), 5, "Zoom", "Virtual");
         activities.add(activity);
 
         assertTrue(volunteerService.registerVolunteerToActivity(volunteer, activity));
@@ -57,7 +57,7 @@ class MainTest {
     void testCancelEnrollment() {
         Volunteer volunteer = new Volunteer("Alice", 30, "alice@example.com");
         volunteerService.registerVolunteer(volunteer);
-        Activity activity = new VirtualActivity("Webinar", "Online learning", new Date(), 5, "Zoom");
+        Activity activity = new VirtualActivity("Webinar", "Online learning", new Date(), 5, "Zoom", "Virtual");
         activities.add(activity);
         volunteerService.registerVolunteerToActivity(volunteer, activity);
         

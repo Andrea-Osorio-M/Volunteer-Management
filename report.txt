@@ -1,0 +1,9 @@
+===== Volunteer Management Report =====
+
+Registered Volunteers:
+- Ashly Andrea Osorio Marquez (Age: 20, Email: ashly.osorio@gmail.com)
+- Andres David Perez Castaneda (Age: 21, Email: andres.perez11@gmail.com)
+
+Activities:
+Activity{name='Football', description='Game football', date=Tue Apr 01 00:00:00 COT 2025, maxParticipants=1, type='In-Person', registeredVolunteers=1}
+  * Ashly Andrea Osorio Marquez

@@ -22,7 +22,11 @@ public class Volunteer {
      */
     public Volunteer(String name, int age, String email) {
         this.name = name;
-        this.setAge(age);
+        if (age >= 18) {
+            this.age = age;
+        } else {
+            throw new IllegalArgumentException("The volunteer must be at least 18 years old.");
+        }
         this.email = email;
     }
 

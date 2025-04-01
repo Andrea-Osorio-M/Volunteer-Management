@@ -8,7 +8,7 @@ import java.util.Date;
 public class VirtualActivity extends Activity {
     private String platform;
 
-    public VirtualActivity(String name, String description, Date date, int maxParticipants, String platform) {
+    public VirtualActivity(String name, String description, Date date, int maxParticipants, String platform, String type) {
         super(name, description, date, maxParticipants);
         this.platform = platform;
     }
