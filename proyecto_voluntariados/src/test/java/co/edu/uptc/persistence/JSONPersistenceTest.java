@@ -7,12 +7,10 @@ import co.edu.uptc.model.Activity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class JSONPersistenceTest {
@@ -32,7 +30,7 @@ class JSONPersistenceTest {
         new File(VOLUNTEERS_FILE).delete();
         new File(ACTIVITIES_FILE).delete();
     }
-
+    //Test to check if saving and loading volunteers correctly 
     @Test
     void testSaveAndLoadVolunteers() {
         List<Volunteer> volunteers = new ArrayList<>();
@@ -46,7 +44,7 @@ class JSONPersistenceTest {
         assertEquals("John Doe", loadedVolunteers.get(0).getName());
         assertEquals("Jane Smith", loadedVolunteers.get(1).getName());
     }
-
+//Test to check if saving and loading acativities correctly 
     @Test
     void testSaveAndLoadActivities() {
         List<Activity> activities = new ArrayList<>();
@@ -60,13 +58,13 @@ class JSONPersistenceTest {
         assertEquals("Tree Planting", loadedActivities.get(0).getName());
         assertEquals("Online Workshop", loadedActivities.get(1).getName());
     }
-
+// Test to check the behavior when trying to load volunteers from a non-existing file.
     @Test
     void testLoadVolunteers_WhenFileDoesNotExist() {
         List<Volunteer> volunteers = JSONPersistence.loadVolunteers();
         assertTrue(volunteers.isEmpty());
     }
-
+// Test to check the behavior when trying to load activities from a non-existing file.
     @Test
     void testLoadActivities_WhenFileDoesNotExist() {
         List<Activity> activities = JSONPersistence.loadActivities();
