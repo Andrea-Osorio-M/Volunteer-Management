@@ -1,16 +1,47 @@
 [
   {
-    "location": "Sogamoso",
-    "name": "Football",
-    "description": "Game football",
-    "date": "Apr 1, 2025, 12:00:00 AM",
+    "location": "1",
+    "name": "1",
+    "description": "1",
+    "date": "Nov 11, 1111, 12:00:00 AM",
     "maxParticipants": 1,
     "registeredVolunteers": [
       {
-        "name": "Ashly Andrea Osorio Marquez",
-        "age": 20,
-        "email": "ashly.osorio@gmail.com"
+        "name": "e",
+        "age": 22,
+        "email": "2"
       }
-    ]
+    ],
+    "type": "In-Person"
+  },
+  {
+    "platform": "2",
+    "name": "2",
+    "description": "2",
+    "date": "Oct 10, 2010, 12:00:00 AM",
+    "maxParticipants": 2,
+    "registeredVolunteers": [
+      {
+        "name": "r",
+        "age": 45,
+        "email": "3"
+      }
+    ],
+    "type": "Virtual"
+  },
+  {
+    "location": "1",
+    "name": "6",
+    "description": "6",
+    "date": "Sep 9, 2018, 12:00:00 AM",
+    "maxParticipants": 6,
+    "registeredVolunteers": [
+      {
+        "name": "r",
+        "age": 45,
+        "email": "3"
+      }
+    ],
+    "type": "In-Person"
   }
 ]

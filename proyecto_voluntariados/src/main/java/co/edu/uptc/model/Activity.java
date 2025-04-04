@@ -34,7 +34,7 @@ public abstract class Activity {
         }
         this.maxParticipants = maxParticipants;
         this.registeredVolunteers = new ArrayList<>();
-
+        this.type = type;
     }
 
     public String getName() {

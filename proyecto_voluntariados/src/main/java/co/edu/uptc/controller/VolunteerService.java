@@ -1,7 +1,5 @@
 package co.edu.uptc.controller;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +17,12 @@ public class VolunteerService {
         try {
             this.volunteers = JSONPersistence.loadVolunteers();
             this.activities = JSONPersistence.loadActivities();
+    
+            System.out.println("Loaded activities: " + activities.size());
+            for (Activity activity : activities) {
+                System.out.println("Activity: " + activity.getName() + ", Type: " + activity.getType());
+            }
+    
         } catch (Exception e) {
             throw new RuntimeException("Error loading data: " + e.getMessage(), e);
         }
@@ -28,17 +32,20 @@ public class VolunteerService {
         if (volunteer.getAge() < 18) {
             throw new IllegalArgumentException("The volunteer must be at least 18 years old to register.");
         }
-        volunteers.add(volunteer);
-        JSONPersistence.saveVolunteers(volunteers);
-        return true;
+        if (!volunteers.contains(volunteer)) {
+            volunteers.add(volunteer);
+            JSONPersistence.saveVolunteers(volunteers);
+            return true;
+        }
+        return false;
     }
 
     public List<Volunteer> getVolunteers() {
-        return volunteers;
+        return new ArrayList<>(volunteers);
     }
 
     public List<Activity> getActivities() {
-        return activities;
+        return new ArrayList<>(activities);
     }    
 
     public Volunteer findVolunteerByEmail(String email) {
@@ -55,18 +62,6 @@ public class VolunteerService {
                 .orElse(null);
     }
 
-    public boolean registerVolunteerToActivity(Volunteer volunteer, Activity activity) {
-        if (activity.getRegisteredVolunteers().contains(volunteer)) {
-            throw new IllegalStateException("Volunteer is already registered for this activity.");
-        }
-        if (activity.getRegisteredVolunteers().size() >= activity.getMaxParticipants()) {
-            throw new IllegalStateException("Activity is already full.");
-        }
-        boolean success = activity.registerVolunteer(volunteer);
-        if (success) JSONPersistence.saveActivities(activities);
-        return success;
-    }
-
     public boolean cancelVolunteerFromActivity(Volunteer volunteer, Activity activity) {
         if (!activity.getRegisteredVolunteers().contains(volunteer)) {
             throw new IllegalStateException("Volunteer is not registered in this activity.");
@@ -76,32 +71,39 @@ public class VolunteerService {
         return success;
     }
 
+
     public void generateParticipationReport() {
-        Map<Volunteer, Long> participationCounts = activities.stream()
-            .flatMap(activity -> activity.getRegisteredVolunteers().stream())
-            .collect(Collectors.groupingBy(v -> v, Collectors.counting()));
-
-        List<Map.Entry<Volunteer, Long>> sortedVolunteers = new ArrayList<>(participationCounts.entrySet());
-        sortedVolunteers.sort((a, b) -> Long.compare(b.getValue(), a.getValue()));
-
-        try (FileWriter writer = new FileWriter("volunteer_report.txt")) {
-            for (Map.Entry<Volunteer, Long> entry : sortedVolunteers) {
-                writer.write(entry.getKey().getName() + " - " + entry.getValue() + " activities\n");
-            }
-        } catch (IOException e) {
-            System.err.println("Error writing report: " + e.getMessage());
-        }
+        JSONPersistence.generateReport(volunteers, activities);
     }
 
     public boolean removeVolunteerByEmail(String email) {
-        List<Volunteer> volunteers = getVolunteers(); // Obtener lista de voluntarios
-    
-        for (int i = 0; i < volunteers.size(); i++) {
-            if (volunteers.get(i).getEmail().equalsIgnoreCase(email)) {
-                volunteers.remove(i);
-                return true; // Se eliminó correctamente
-            }
+        Volunteer volunteer = findVolunteerByEmail(email);
+        if (volunteer != null) {
+            volunteers.remove(volunteer);
+            JSONPersistence.saveVolunteers(volunteers);
+            return true;
         }
-        return false; // No se encontró el voluntario
+        return false;
+    }
+    public boolean registerVolunteerToActivity(Volunteer volunteer, Activity activity) {
+        if (activity.getRegisteredVolunteers().contains(volunteer)) {
+            throw new IllegalStateException("Volunteer is already registered for this activity.");
+        }
+        if (activity.getRegisteredVolunteers().size() >= activity.getMaxParticipants()) {
+            throw new IllegalStateException("Activity is already full.");
+        }
+    
+        // Cargar actividades actuales antes de registrar
+        activities = JSONPersistence.loadActivities(); // Asegúrate de cargar las actividades previamente guardadas
+    
+        boolean success = activity.registerVolunteer(volunteer);
+        if (success) {
+            // Verifica si la actividad ya está en la lista
+            if (!activities.contains(activity)) {
+                activities.add(activity); // Si no está, añadirla a la lista
+            }
+            JSONPersistence.saveActivities(activities); // Guardar la lista de actividades
+        }
+        return success;
     }
 }

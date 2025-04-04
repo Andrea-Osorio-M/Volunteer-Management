@@ -14,33 +14,33 @@ import co.edu.uptc.model.Activity;
 import co.edu.uptc.model.InPersonActivity;
 import co.edu.uptc.model.VirtualActivity;
 
-/**
- * Gson TypeAdapter to handle serialization and deserialization of Activity and its subclasses.
- */
 public class ActivityAdapter implements JsonSerializer<Activity>, JsonDeserializer<Activity> {
-
     @Override
     public JsonElement serialize(Activity activity, Type type, JsonSerializationContext context) {
         JsonObject jsonObject = context.serialize(activity).getAsJsonObject();
-        jsonObject.addProperty("type", activity.getClass().getSimpleName()); // Add type identifier
+        String activityType = activity.getClass().getSimpleName();
+        jsonObject.addProperty("type", activityType);  // Agregar identificador de tipo
         return jsonObject;
     }
 
     @Override
-    public Activity deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext context) 
-            throws JsonParseException {
-        JsonObject jsonObject = jsonElement.getAsJsonObject();
-        String activityType = jsonObject.get("type").getAsString();
+public Activity deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    JsonObject jsonObject = json.getAsJsonObject();
 
-        // Determine the correct subclass to instantiate
-        switch (activityType) {
-            case "In-Person" -> {
-                return context.deserialize(jsonObject, InPersonActivity.class);
-            }
-            case "Virtual" -> {
-                return context.deserialize(jsonObject, VirtualActivity.class);
-            }
-            default -> throw new JsonParseException("Unknown activity type: " + activityType);
-        }
+    if (!jsonObject.has("type") || jsonObject.get("type").isJsonNull()) {
+        throw new JsonParseException("Missing or null 'type' field in JSON: " + jsonObject);
     }
+
+    String activityType = jsonObject.get("type").getAsString();
+
+    switch (activityType) {
+        case "Virtual":
+            return context.deserialize(json, VirtualActivity.class);
+        case "In-Person":
+            return context.deserialize(json, InPersonActivity.class);
+        default:
+            throw new JsonParseException("Unknown activity type: " + activityType);
+    }
+}
+
 }
